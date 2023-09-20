@@ -28,7 +28,7 @@ func main() {
 		for {
 			err := updateMetrics(container.DkronClient(), container.GetMetrics())
 			if err != nil {
-				log.Print("Error CreateContainer ", err)
+				log.Print("Error updateMetrics ", err)
 			}
 
 			time.Sleep(5 * time.Second)
