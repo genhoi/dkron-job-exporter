@@ -26,11 +26,12 @@ type Container struct {
 type config struct {
 	listenAddr string
 	dkronApi   string
+	version    string
 }
 
 func (c *Container) GetMetrics() *Metrics {
 	onceMetrics.Do(func() {
-		c.metrics = CreateMetrics()
+		c.metrics = CreateMetrics(c.config.version)
 	})
 
 	return c.metrics
@@ -52,8 +53,10 @@ func (c *Container) GetHttpServer() *http.Server {
 
 func (c *Container) getPrometheusHandler() http.Handler {
 	registry := prometheus.NewRegistry()
+	registry.MustRegister(c.GetMetrics().Version)
 	registry.MustRegister(c.GetMetrics().JobLastSuccessfulRun)
 	registry.MustRegister(c.GetMetrics().JobLastStart)
+	registry.MustRegister(c.GetMetrics().DrkonApiUp)
 
 	return promhttp.InstrumentMetricHandler(
 		registry,
@@ -69,21 +72,23 @@ func (c *Container) DkronClient() *dkron.Client {
 	return c.dkronClient
 }
 
-func CreateContainer() (*Container, error) {
-	err := godotenv.Load(".env.local")
-	if err != nil {
-		err = godotenv.Load(".env")
-		if err != nil {
-			return nil, err
-		}
-	}
+func CreateContainer(version string) (*Container, error) {
+	_ = godotenv.Load(".env.local")
 
 	listen := os.Getenv("DKRON_JOB_EXPORTER_ADDR")
+	if listen == "" {
+		listen = ":10909"
+	}
+
 	dkronApi := os.Getenv("DKRON_JOB_EXPORTER_DKRON_API")
+	if dkronApi == "" {
+		dkronApi = "http://dkron:8080"
+	}
 
 	conf := config{
 		listenAddr: listen,
 		dkronApi:   dkronApi,
+		version:    version,
 	}
 
 	return &Container{config: conf}, nil

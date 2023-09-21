@@ -10,8 +10,12 @@ import (
 	"time"
 )
 
+var (
+	version string
+)
+
 func main() {
-	container, err := app.CreateContainer()
+	container, err := app.CreateContainer(version)
 	if err != nil {
 		log.Fatal("Error CreateContainer ", err)
 	}
@@ -26,9 +30,13 @@ func main() {
 
 	go func() {
 		for {
-			err := updateMetrics(container.DkronClient(), container.GetMetrics())
+			metrics := container.GetMetrics()
+			err := updateMetrics(container.DkronClient(), metrics)
 			if err != nil {
+				metrics.DrkonApiUp.WithLabelValues().Set(0)
 				log.Print("Error updateMetrics ", err)
+			} else {
+				metrics.DrkonApiUp.WithLabelValues().Set(1)
 			}
 
 			time.Sleep(5 * time.Second)
