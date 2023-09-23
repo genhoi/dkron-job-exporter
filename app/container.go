@@ -56,6 +56,7 @@ func (c *Container) getPrometheusHandler() http.Handler {
 	registry.MustRegister(c.GetMetrics().Version)
 	registry.MustRegister(c.GetMetrics().JobLastSuccessfulRun)
 	registry.MustRegister(c.GetMetrics().JobLastStart)
+	registry.MustRegister(c.GetMetrics().JobExecutionSeconds)
 	registry.MustRegister(c.GetMetrics().DrkonApiUp)
 
 	return promhttp.InstrumentMetricHandler(
