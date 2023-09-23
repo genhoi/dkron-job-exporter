@@ -10,6 +10,8 @@ type Metrics struct {
 	JobLastSuccessfulRun *prometheus.GaugeVec
 	JobLastStart         *prometheus.GaugeVec
 	JobExecutionSeconds  *prometheus.GaugeVec
+	JobFailedCount       *prometheus.GaugeVec
+	JobSuccessCount      *prometheus.GaugeVec
 	DrkonApiUp           *prometheus.GaugeVec
 }
 
@@ -27,19 +29,27 @@ func CreateMetrics(version string) *Metrics {
 		),
 		JobLastSuccessfulRun: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_job_last_successful_run_ts",
-			Help: "Время последнего успешного запуска задачи",
+			Help: "Timestamp of the last successful job start",
 		}, []string{"job"}),
 		JobLastStart: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_job_last_start_ts",
-			Help: "Время последнего старта задачи",
+			Help: "Timestamp of last job start",
 		}, []string{"job"}),
 		JobExecutionSeconds: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_job_execution_seconds",
-			Help: "Время успешного выполнения задачи",
+			Help: "Time of successful job completion in seconds",
+		}, []string{"job"}),
+		JobFailedCount: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "dkron_job_failed_count",
+			Help: "Count of failed job execution",
+		}, []string{"job"}),
+		JobSuccessCount: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "dkron_job_success_count",
+			Help: "Count of success job execution",
 		}, []string{"job"}),
 		DrkonApiUp: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_api_up",
-			Help: "Доступность api Dkron",
+			Help: "Availability of Dkron API",
 		}, []string{}),
 	}
 }
