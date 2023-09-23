@@ -9,6 +9,7 @@ type Metrics struct {
 	Version              prometheus.GaugeFunc
 	JobLastSuccessfulRun *prometheus.GaugeVec
 	JobLastStart         *prometheus.GaugeVec
+	JobExecutionSeconds  *prometheus.GaugeVec
 	DrkonApiUp           *prometheus.GaugeVec
 }
 
@@ -31,6 +32,10 @@ func CreateMetrics(version string) *Metrics {
 		JobLastStart: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_job_last_start_ts",
 			Help: "Время последнего старта задачи",
+		}, []string{"job"}),
+		JobExecutionSeconds: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Name: "dkron_job_execution_seconds",
+			Help: "Время успешного выполнения задачи",
 		}, []string{"job"}),
 		DrkonApiUp: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "dkron_api_up",

@@ -62,6 +62,9 @@ func updateMetrics(dkronClient *dkron.Client, metrics *app.Metrics) error {
 		for _, execution := range executions {
 			if execution.Success {
 				metrics.JobLastSuccessfulRun.With(prometheus.Labels{"job": job.Name}).Set(float64(execution.FinishedAt.Unix()))
+				metrics.JobExecutionSeconds.With(prometheus.Labels{"job": job.Name}).Set(
+					float64(execution.FinishedAt.Unix()) - float64(execution.StartedAt.Unix()),
+				)
 				break
 			}
 		}
